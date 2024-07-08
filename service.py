@@ -16,7 +16,7 @@ def getHistory(db):
     no_defective = full_history.filter(models.Fabric.status == False).count()
     # defective = full_history.filter(models.Fabric.status == True).count()
 
-    accuray = (no_defective/total)*100
+    accuray = round((no_defective/total)*100,2)
     
     data = {
         "accuracy": accuray,

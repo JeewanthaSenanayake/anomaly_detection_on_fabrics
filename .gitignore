@@ -1,2 +1,4 @@
 .venv/
 __pycache__/
+ML_Model/data/
+ML_Model/results/
