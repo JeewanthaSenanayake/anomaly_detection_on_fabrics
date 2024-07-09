@@ -133,6 +133,8 @@ def detect_defects(original_image, autoencoder, normal_threshold):
     reconstructed_img = reconstruct_img(original_image, autoencoder)
     
     loss_figure, DSSIM_value = create_loss_image(original_image , reconstructed_img)
+
+    loss_figure = cv2.cvtColor(loss_figure, cv2.COLOR_RGB2BGR)
    
     if(DSSIM_value > normal_threshold):
         return loss_figure, True

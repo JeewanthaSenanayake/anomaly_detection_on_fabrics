@@ -25,6 +25,7 @@ def image_to_base64(image):
 
 @fabric_router.post("/isdefective")
 def is_defective(file: UploadFile, db: Session = Depends(get_db)):
+    
         # Ensure the upload directory exists
     if not os.path.exists(UPLOAD_DIR):
         os.makedirs(UPLOAD_DIR)
