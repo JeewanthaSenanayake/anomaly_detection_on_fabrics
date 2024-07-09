@@ -2,9 +2,9 @@ import base64
 import cv2
 import models
 
-def upload_image(id,inpt,oupt,status,db):
+def upload_image(id,inpt,oupt,db):
     try:
-        new_image = models.FabricImage(history_id=id, input_image=inpt, output_image=oupt,status=status)
+        new_image = models.FabricImage(history_id=id, input_image=inpt, output_image=oupt)
         db.add(new_image)
         db.commit()
         db.refresh(new_image)

@@ -60,7 +60,7 @@ def is_defective(file: UploadFile = File(...),Fname: str = Form(...), db: Sessio
     ori_img = image_to_base64(original_image)
     re_img = image_to_base64(figure)
 
-    service.upload_image(id=f_id, inpt=ori_img, oupt=re_img,status=status, db=db)
+    service.upload_image(id=f_id, inpt=ori_img, oupt=re_img, db=db)
 
     submited_data={
         "date":date,
