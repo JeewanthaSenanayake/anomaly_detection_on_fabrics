@@ -1,3 +1,4 @@
+import base64
 import cv2
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 import service
@@ -13,6 +14,14 @@ treshold = 0.18039123161949278
 UPLOAD_DIR = "uploaded_images"
 
 fabric_router = APIRouter(prefix="/fabric/api/v1", tags=["Fabric"])
+
+def image_to_base64(image):
+    retval, buffer = cv2.imencode('.jpeg', image)
+    if retval:
+        base64_string = base64.b64encode(buffer).decode('utf-8')
+        return base64_string
+    else:
+        return None
 
 @fabric_router.post("/isdefective")
 def is_defective(file: UploadFile, db: Session = Depends(get_db)):
@@ -32,15 +41,30 @@ def is_defective(file: UploadFile, db: Session = Depends(get_db)):
     date = datetime.now()
     figure, status = ml.detect_defects(original_image, autoencoder, treshold)
     # status = True #get from ml models
-    add_db = service.setData(date=date, status=status, file=file.filename, db=db)
+    add_db = service.setData(date=date, status=status, file=file, inputf=original_image, output=figure , db=db)
 
     os.remove(file_path)
 
+    # submited_data = service.getHistoryId(id=data_id,db=db)
+    ori_img = image_to_base64(original_image)
+    re_img = image_to_base64(figure)
+    submited_data={
+        "date":date,
+        "status":status,
+        "file":file.filename,
+        "input_image":ori_img,
+        "reconstruct_image":re_img
+    }
+
     if add_db:
-        return {"status": status, "date": date, "file": file.filename}
+        return submited_data
     else:
         return HTTPException(status_code=505, detail="DB error")
 
 @fabric_router.get("/productionhistory")
 def production_history(db: Session = Depends(get_db)):
     return service.getHistory(db=db)
+
+@fabric_router.get("/productionhistory/{id}")
+def production_history(id: int, db: Session = Depends(get_db)):
+    return service.getHistoryId(id=id,db=db)

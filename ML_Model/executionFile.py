@@ -141,21 +141,21 @@ def detect_defects(original_image, autoencoder, normal_threshold):
     
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    dataset = "carpet"
-    train_or_test = "test"
-    category = "color"
-    img_name = "009.png"
+#     dataset = "carpet"
+#     train_or_test = "test"
+#     category = "color"
+#     img_name = "009.png"
 
-    ## read/get original image
-    original_image = cv2.imread(f"data/{dataset}/{train_or_test}/{category}/{img_name}", 0)  
+#     ## read/get original image
+#     original_image = cv2.imread(f"data/{dataset}/{train_or_test}/{category}/{img_name}", 0)  
     
-    # 1) set threshold
-    normal_threshold = 0.18039123161949278
+#     # 1) set threshold
+#     normal_threshold = 0.18039123161949278
 
-    # 2) Create AE
-    autoencoder = generate_AE()
+#     # 2) Create AE
+#     autoencoder = generate_AE()
 
-    # 3) create reconstructed image    
-    loss_figure, is_defect = detect_defects(original_image, autoencoder,normal_threshold )
+#     # 3) create reconstructed image    
+#     loss_figure, is_defect = detect_defects(original_image, autoencoder,normal_threshold )

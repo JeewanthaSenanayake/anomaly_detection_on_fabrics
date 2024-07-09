@@ -1,5 +1,5 @@
 # models.py
-from sqlalchemy import Column, Integer, TIMESTAMP, Boolean, String
+from sqlalchemy import Column, Integer, TIMESTAMP, Boolean, String, LargeBinary
 from database import Base
 
 class Fabric(Base):
