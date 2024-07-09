@@ -1,6 +1,6 @@
 import base64
 import cv2
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 import service
 from database import engine, get_db
 from sqlalchemy.orm import Session
@@ -24,35 +24,48 @@ def image_to_base64(image):
         return None
 
 @fabric_router.post("/isdefective")
-def is_defective(file: UploadFile, db: Session = Depends(get_db)):
+def is_defective(file: UploadFile = File(...),Fname: str = Form(...), db: Session = Depends(get_db)):
     
+    print("*************************************************************")
+    print(Fname)
+    print(file.filename)
+    print("*************************************************************")
+    file_name = file.filename
+    if(Fname=="none"):
+        file_name = file.filename
+    else:
+        file_name = Fname
+
         # Ensure the upload directory exists
     if not os.path.exists(UPLOAD_DIR):
         os.makedirs(UPLOAD_DIR)
 
     # Define the file path
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    file_path = os.path.join(UPLOAD_DIR, file_name)
 
     # Save the file to the local file system
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    original_image = cv2.imread(f"{UPLOAD_DIR}/{file.filename}", 0) 
+    original_image = cv2.imread(f"{UPLOAD_DIR}/{file_name}", 0) 
 
     date = datetime.now()
     figure, status = ml.detect_defects(original_image, autoencoder, treshold)
     # status = True #get from ml models
-    add_db = service.setData(date=date, status=status, file=file, inputf=original_image, output=figure , db=db)
+    add_db, f_id = service.setData(date=date, status=status, file=file_name, inputf=original_image, output=figure , db=db)
 
     os.remove(file_path)
 
     # submited_data = service.getHistoryId(id=data_id,db=db)
     ori_img = image_to_base64(original_image)
     re_img = image_to_base64(figure)
+
+    service.upload_image(id=f_id, inpt=ori_img, oupt=re_img,status=status, db=db)
+
     submited_data={
         "date":date,
         "status":status,
-        "file":file.filename,
+        "file":file_name,
         "input_image":ori_img,
         "reconstruct_image":re_img
     }
@@ -69,3 +82,7 @@ def production_history(db: Session = Depends(get_db)):
 @fabric_router.get("/productionhistory/{id}")
 def production_history(id: int, db: Session = Depends(get_db)):
     return service.getHistoryId(id=id,db=db)
+
+@fabric_router.get("/getProductById/{id}")
+def get_product_by_id(id: int, db: Session = Depends(get_db)):
+    return service.getProductById(id=id, db=db)

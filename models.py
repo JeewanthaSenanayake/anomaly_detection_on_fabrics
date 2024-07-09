@@ -18,3 +18,4 @@ class FabricImage(Base):
     output_image = Column(Text(length=16777215))  # MEDIUMTEXT
     history_id = Column(Integer, index=True, unique=True)
 
+
